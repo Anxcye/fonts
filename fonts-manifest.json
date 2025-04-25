@@ -1,5 +1,33 @@
 [
     {
+        "id": "atkinson",
+        "name": "Atkinson Hyperlegible Next",
+        "files": [
+            "atkinson/AtkinsonHyperlegibleNext-Regular.ttf"
+        ],
+        "preview": "atkinson/preview.png",
+        "desc": "Atkinson Hyperlegible, named after the founder of the Braille Institute, has been developed specifically to increase legibility for readers with low vision, and to improve comprehension.",
+        "official": "https://www.brailleinstitute.org/freefont/",
+        "license": {
+            "name": "SIL OFL 1.1",
+            "url": "https://openfontlicense.org/open-font-license-official-text/"
+        }
+    },
+    {
+        "id": "jhlst",
+        "name": "京華老宋体",
+        "files": [
+            "jhlst/jhlstv2.ttf"
+        ],
+        "preview": "jhlst/preview.png",
+        "desc": "真正成体系的铅字扫描字体。",
+        "official": "https://zhuanlan.zhihu.com/p/637491623",
+        "license": {
+            "name": "Other License",
+            "url": "https://zhuanlan.zhihu.com/p/637491623"
+        }
+    },
+    {
         "id": "mizukigothic",
         "name": "水木黑体",
         "files": [
@@ -11,6 +39,20 @@
         "license": {
             "name": "IPA Font License 1.0",
             "url": "https://moji.or.jp/ipafont/license/"
+        }
+    },
+    {
+        "id": "yozai",
+        "name": "悠哉字体",
+        "files": [
+            "yozai/Yozai-Regular.ttf"
+        ],
+        "preview": "yozai/preview.png",
+        "desc": "一款基于 Y.OzFont 的手写风格的字体。",
+        "official": "https://github.com/lxgw/yozai-font",
+        "license": {
+            "name": "SIL OFL 1.1",
+            "url": "https://openfontlicense.org/open-font-license-official-text/"
         }
     },
     {
@@ -413,7 +455,7 @@
         ],
         "preview": "yrdzst/preview.png",
         "desc": "杨任东竹石体于2017年4月26日世界知识产权日正式发布，本字体版本为1.23。字体按照GB2312-80书写，并增补了少量常见汉字；整套字体有7个字重，共计50000余个字符。本套字体授权全社会免费商用，意味着您可以将其无限制地捆入您的商业产品中，如海报、包装、logo、网页、APP等。",
-        "official": "ttps://mp.weixin.qq.com/s/7kv3i_YEs7x9_9IrCDYvBA",
+        "official": "https://mp.weixin.qq.com/s/7kv3i_YEs7x9_9IrCDYvBA",
         "license": {
             "name": "Other License",
             "url": "https://mp.weixin.qq.com/s/7kv3i_YEs7x9_9IrCDYvBA"
@@ -669,20 +711,6 @@
         "license": {
             "name": "IPA Font License 1.0",
             "url": "https://moji.or.jp/ipafont/license/"
-        }
-    },
-    {
-        "id": "atkinson",
-        "name": "Atkinson Hyperlegible Next",
-        "files": [
-            "atkinson/AtkinsonHyperlegibleNext-Regular.ttf"
-        ],
-        "preview": "atkinson/preview.png",
-        "desc": "Atkinson Hyperlegible, named after the founder of the Braille Institute, has been developed specifically to increase legibility for readers with low vision, and to improve comprehension.",
-        "official": "https://www.brailleinstitute.org/freefont/",
-        "license": {
-            "name": "SIL OFL 1.1",
-            "url": "https://openfontlicense.org/open-font-license-official-text/"
         }
     },
     {
