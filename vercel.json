@@ -10,14 +10,6 @@
         {
           "key": "Cache-Control",
           "value": "public, no-transform, max-age=31536000, stale-while-revalidate"
-        },
-        {
-          "key": "Content-Length",
-          "value": "auto"
-        },
-        {
-          "key": "Accept-Ranges",
-          "value": "bytes"
         }
       ]
     }
