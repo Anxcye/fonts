@@ -3,8 +3,22 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
-        { "key": "Cache-Control","value": "public, no-transform, max-age=31536000, stale-while-revalidate"}
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, no-transform, max-age=31536000, stale-while-revalidate"
+        },
+        {
+          "key": "Content-Length",
+          "value": "auto"
+        },
+        {
+          "key": "Accept-Ranges",
+          "value": "bytes"
+        }
       ]
     }
   ]
