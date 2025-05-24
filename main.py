@@ -219,6 +219,10 @@ def verify_font_files():
     duplicate_ids = set()
     seen_ids = set()
     
+    # Get manifest font files
+    manifest_files = get_manifest_font_files(manifest)
+    
+    # Check each font entry in the manifest
     for font in manifest:
         # Check for duplicate IDs
         if "id" in font:
@@ -245,9 +249,12 @@ def verify_font_files():
         else:
             missing_previews.append((font.get("id", "unknown"), "No preview specified"))
     
+    # Find orphaned font files (exist but not in manifest)
+    orphaned_files = find_orphaned_font_files()
+    
     # Print results
-    if not missing_files and not missing_previews and not duplicate_ids:
-        print("\nAll font files and previews are present. No duplicate IDs found.")
+    if not missing_files and not missing_previews and not duplicate_ids and not orphaned_files:
+        print("\nAll font files and previews are present. No duplicate IDs found. No orphaned files.")
     else:
         if missing_files:
             print("\nMissing font files:")
@@ -263,7 +270,28 @@ def verify_font_files():
             print("\nDuplicate font IDs:")
             for font_id in duplicate_ids:
                 print(f"  Duplicate ID: {font_id}")
- 
+        
+        if orphaned_files:
+            print("\nOrphaned font files (exist but not in manifest):")
+            for i, file in enumerate(orphaned_files, 1):
+                print(f"  {i}. {file}")
+            
+            # Ask if user wants to delete orphaned files
+            confirm = input("\nDo you want to delete these orphaned files? (y/n): ").strip().lower()
+            if confirm == 'y':
+                deleted_count = 0
+                for file in orphaned_files:
+                    full_path = os.path.join(FONTS_DIR, file)
+                    try:
+                        os.remove(full_path)
+                        print(f"Deleted: {file}")
+                        deleted_count += 1
+                    except Exception as e:
+                        print(f"Error deleting {file}: {e}")
+                
+                print(f"\nDeleted {deleted_count} out of {len(orphaned_files)} orphaned font files.")
+            else:
+                print("Orphaned files not deleted.") 
 def reduce_large_font_files():
     """Find font files larger than 24.5MiB and reduce their size using subsetting."""
     import subprocess
