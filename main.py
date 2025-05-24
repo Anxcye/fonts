@@ -263,6 +263,133 @@ def verify_font_files():
             print("\nDuplicate font IDs:")
             for font_id in duplicate_ids:
                 print(f"  Duplicate ID: {font_id}")
+ 
+def reduce_large_font_files():
+    """Find font files larger than 24.5MiB and reduce their size using subsetting."""
+    import subprocess
+    from pathlib import Path
+    
+    SIZE_LIMIT = 24.5 * 1024 * 1024  # 24.5 MiB in bytes
+    SUBSET_FILE = "./subset.txt"
+    
+    # Load subset characters
+    try:
+        with open(SUBSET_FILE, 'r', encoding='utf-8') as f:
+            subset_chars = f.read()
+        print(f"Loaded {len(subset_chars)} characters from subset file.")
+    except FileNotFoundError:
+        print(f"Error: Subset file '{SUBSET_FILE}' not found.")
+        return
+    except Exception as e:
+        print(f"Error reading subset file: {e}")
+        return
+    
+    # Check if fonttools is installed
+    try:
+        subprocess.run(['pyftsubset', '--help'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        print("Error: 'pyftsubset' not found. Please install fonttools:")
+        print("pip install fonttools")
+        return
+    
+    # Load manifest to get font files
+    manifest = load_manifest()
+    all_font_files = []
+    for font in manifest:
+        if "files" in font and font["files"]:
+            for file in font["files"]:
+                all_font_files.append((font.get("id", "unknown"), file))
+    
+    # Find large font files
+    large_files = []
+    for font_id, file in all_font_files:
+        file_path = Path(FONTS_DIR) / file
+        if file_path.exists():
+            size = file_path.stat().st_size
+            if size > SIZE_LIMIT:
+                large_files.append((font_id, file, size))
+    
+    if not large_files:
+        print("No font files larger than 24.5MiB found.")
+        return
+    
+    # Display large files
+    print(f"\nFound {len(large_files)} font files larger than 24.5MiB:")
+    for i, (font_id, file, size) in enumerate(large_files, 1):
+        print(f"{i}. Font ID: {font_id}, File: {file}, Size: {size/1024/1024:.2f} MiB")
+    
+    confirm = input("\nDo you want to reduce these files by subsetting? (y/n): ").strip().lower()
+    if confirm != 'y':
+        print("Operation cancelled.")
+        return
+    
+    # Process each large file
+    results = []
+    still_large = []
+    
+    for font_id, file, original_size in large_files:
+        file_path = Path(FONTS_DIR) / file
+        output_dir = file_path.parent
+        output_file = output_dir / f"{file_path.stem}.subset{file_path.suffix}"
+        
+        print(f"\nProcessing {file}...")
+        
+        # Create subset command
+        cmd = [
+            'pyftsubset', 
+            str(file_path),
+            f'--text={subset_chars}',
+            '--layout-features=*',
+            f'--output-file={output_file}'
+        ]
+        
+        try:
+            # Run subsetting command
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            # Check if output file exists and get its size
+            if output_file.exists():
+                new_size = output_file.stat().st_size
+                
+                # Check if we should replace the original
+                if new_size < original_size:
+                    # Backup original
+                    backup_file = output_dir / f"{file_path.stem}.original{file_path.suffix}"
+                    file_path.rename(backup_file)
+                    
+                    # Move subset to original name
+                    output_file.rename(file_path)
+                    
+                    results.append((font_id, file, original_size, new_size))
+                    
+                    # Check if still over limit
+                    if new_size > SIZE_LIMIT:
+                        still_large.append((font_id, file, new_size))
+                else:
+                    print(f"  Subset not smaller than original, keeping original.")
+                    output_file.unlink()  # Delete the output file
+            else:
+                print(f"  Error: Output file not created.")
+        
+        except Exception as e:
+            print(f"  Error processing {file}: {e}")
+    
+    # Print results
+    if results:
+        print("\nSubsetting Results:")
+        print("------------------------------------------------------------")
+        print("Font ID                 | Original Size | New Size | Reduction")
+        print("------------------------------------------------------------")
+        for font_id, file, original, new in results:
+            reduction = (1 - new/original) * 100
+            print(f"{font_id:<24} | {original/1024/1024:11.2f} MiB | {new/1024/1024:8.2f} MiB | {reduction:8.2f}%")
+    
+    if still_large:
+        print("\nFonts still larger than 24.5MiB after subsetting:")
+        for font_id, file, size in still_large:
+            print(f"  Font ID: {font_id}, File: {file}, Size: {size/1024/1024:.2f} MiB")
+    
+    print("\nFont reduction completed.")
 
 def main_menu():
     """Display the main menu and handle user input."""
@@ -271,8 +398,9 @@ def main_menu():
         print("1. List and delete orphaned font files")
         print("2. Create font preview images")
         print("3. Verify font files and manifests")
-        print("4. Exit")
-        choice = input("\nSelect an option (1-4): ").strip()
+        print("4. Reduce large font files (>24.5MiB)")
+        print("5. Exit")
+        choice = input("\nSelect an option (1-5): ").strip()
         
         if choice == '1':
             delete_orphaned_files()
@@ -281,6 +409,8 @@ def main_menu():
         elif choice == '3':
             verify_font_files()
         elif choice == '4':
+            reduce_large_font_files()
+        elif choice == '5':
             print("Exiting...")
             break
         else:
