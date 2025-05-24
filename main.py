@@ -419,6 +419,44 @@ def reduce_large_font_files():
     
     print("\nFont reduction completed.")
 
+def update_file_size_info():
+    """Update the manifest JSON with file size information for each font."""
+    manifest = load_manifest()
+    updated_count = 0
+    
+    print("\nUpdating font file size information in manifest...")
+    
+    for font in manifest:
+        if "files" in font and font["files"]:
+            total_size = 0
+            for file in font["files"]:
+                file_path = os.path.join(FONTS_DIR, file)
+                if os.path.exists(file_path):
+                    size = os.path.getsize(file_path)
+                    total_size += size
+            
+            # Update or add the size field
+            old_size = font.get("size", None)
+            font["size"] = total_size
+            
+            # Determine if this was an update or an addition
+            if old_size is None:
+                print(f"Added size: {font.get('id', 'unknown')} - {total_size/1024/1024:.2f} MiB")
+            elif old_size != total_size:
+                print(f"Updated size: {font.get('id', 'unknown')} - {old_size/1024/1024:.2f} MiB → {total_size/1024/1024:.2f} MiB")
+            
+            updated_count += 1
+    
+    # Save the updated manifest
+    try:
+        with open(MANIFEST_PATH, 'w', encoding='utf-8') as f:
+            json.dump(manifest, f, ensure_ascii=False, indent=2)
+        print(f"\nUpdated size information for {updated_count} fonts and saved to {MANIFEST_PATH}")
+        return True
+    except Exception as e:
+        print(f"Error saving manifest: {e}")
+        return False
+
 def main_menu():
     """Display the main menu and handle user input."""
     while True:
@@ -427,8 +465,9 @@ def main_menu():
         print("2. Create font preview images")
         print("3. Verify font files and manifests")
         print("4. Reduce large font files (>24.5MiB)")
-        print("5. Exit")
-        choice = input("\nSelect an option (1-5): ").strip()
+        print("5. Update font file size information in manifest")
+        print("6. Exit")
+        choice = input("\nSelect an option (1-6): ").strip()
         
         if choice == '1':
             delete_orphaned_files()
@@ -439,6 +478,8 @@ def main_menu():
         elif choice == '4':
             reduce_large_font_files()
         elif choice == '5':
+            update_file_size_info()
+        elif choice == '6':
             print("Exiting...")
             break
         else:
